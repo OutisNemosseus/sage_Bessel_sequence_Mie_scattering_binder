@@ -1,8 +1,8 @@
 # Sage ComplexBall spherical sequences → Go Mie rendering
 
+[![Binder](https://mybinder.org/badge_logo.svg)](https://bids.mybinder.org/v2/gh/OutisNemosseus/sage_Bessel_sequence_Mie_scattering_binder/HEAD?urlpath=lab/tree/01_Sage_Spherical_Sequence_API_Export.ipynb)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://hub.bids.mybinder.org/v2/gh/OutisNemosseus/sage_Bessel_sequence_Mie_scattering_binder/HEAD?urlpath=lab/tree/01_Sage_Spherical_Sequence_API_Export.ipynb)
-[![Binder](https://mybinder.org/badge_logo.svg)](https://hub.bids.mybinder.org/v2/gh/OutisNemosseus/sage_Bessel_sequence_Mie_scattering_binder/HEAD?urlpath=lab/tree/01_Sage_Spherical_Sequence_API_Export.ipynb)
-
+[![Binder](https://mybinder.org/badge_logo.svg)](https://bids.mybinder.org/v2/gh/OutisNemosseus/sage_Bessel_sequence_Mie_scattering_binder/HEAD?urlpath=lab/tree/01_Sage_Spherical_Sequence_API_Export.ipynb)
 This repository demonstrates a proposed certified spherical Bessel/Hankel
 sequence API for SageMath. Sage computes the special-function boundary data;
 Go then performs the repeated radial, angular, multipole, and pixel
