@@ -5,6 +5,31 @@ This repository demonstrates a proposed certified spherical Bessel/Hankel
 sequence API for SageMath. Sage computes the special-function boundary data;
 Go then performs the repeated radial, angular, multipole, and pixel
 calculations needed to render an 800×800 Mie-scattering field.
+## Results
+
+### Sage spherical Bessel/Hankel sequences
+
+The Sage API computes eight certified value and derivative sequences through
+order 42. Go reads the exported JSON and plots `log10(|value|)`.
+
+![Spherical sequence magnitudes](sage-spherical-sequences-go-render.png)
+
+### Mie-scattering fields
+
+The Go stage consumes all 344 complex midpoint values exported by Sage and
+computes the complete 800 × 800 field.
+
+| Total field | Scattered field |
+| --- | --- |
+| ![Total Mie field](sage-api-go-mie-total.png) | ![Scattered Mie field](sage-api-go-mie-scattered.png) |
+
+Calculation profile:
+
+- `Lmax = 42`
+- `R / lambda = 3.18`
+- `n = 1.33 + 0 i`
+- grid: `800 × 800`
+- 48,603 cached radii for 320,000 half-plane pixels
 
 ## Launch Binder
 
