@@ -1,0 +1,7 @@
+Sage branch: OutisNemosseus/sage:spherical-bessel-sequences
+Commit: dda09a7229a39589ef50dedcabd1c40de9d4f856
+Base: sagemath/sage:develop at c9c8381962adf66efdcf11ee7966a81e8d7b1267
+
+The Dockerfile applies the complete two-file patch directly to
+/home/sage/sage before Jupyter starts.  The image build and notebook source
+checks fail if the real patched sage.functions.bessel API is unavailable.
