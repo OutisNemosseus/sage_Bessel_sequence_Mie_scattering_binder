@@ -43,7 +43,10 @@ COPY --chown=${NB_USER}:${NB_USER} . ${HOME}/
 RUN cd /home/sage/sage \
     && git apply --check ${HOME}/PR_dda09a7_spherical_bessel_sequences.patch \
     && git apply ${HOME}/PR_dda09a7_spherical_bessel_sequences.patch \
-    && /usr/bin/sage -c "import inspect; from sage.all import spherical_bessel_J_sequence, spherical_bessel_Y_sequence, spherical_hankel1_sequence; expected='/home/sage/sage/src/sage/functions/bessel.py'; assert all(inspect.getsourcefile(f) == expected for f in (spherical_bessel_J_sequence, spherical_bessel_Y_sequence, spherical_hankel1_sequence)); print('PATCHED SAGE API CHECK: PASS')"
+    && SAGE_PACKAGE_DIR=$(/usr/bin/sage -python -c "from pathlib import Path; import sage; print(Path(sage.__file__).resolve().parent)") \
+    && ln -sfn /home/sage/sage/src/sage/functions/all.py "${SAGE_PACKAGE_DIR}/functions/all.py" \
+    && ln -sfn /home/sage/sage/src/sage/functions/bessel.py "${SAGE_PACKAGE_DIR}/functions/bessel.py" \
+    && /usr/bin/sage -c "import inspect; from pathlib import Path; from sage.all import spherical_bessel_J_sequence, spherical_bessel_Y_sequence, spherical_hankel1_sequence; expected=Path('/home/sage/sage/src/sage/functions/bessel.py').resolve(); assert all(Path(inspect.getsourcefile(f)).resolve() == expected for f in (spherical_bessel_J_sequence, spherical_bessel_Y_sequence, spherical_hankel1_sequence)); print('PATCHED SAGE API CHECK: PASS')"
 
 USER ${NB_USER}
 WORKDIR ${HOME}
