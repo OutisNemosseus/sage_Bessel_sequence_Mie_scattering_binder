@@ -38,25 +38,34 @@ RUN apt-get update \
 
 COPY --chown=${NB_USER}:${NB_USER} . ${HOME}/
 
-# Apply the exact public PR commit to Sage's real source tree.  The build must
-# fail if the patch no longer applies; there is deliberately no fallback API.
+# Apply the exact PR patch to Sage's source tree.
+#
+# The stable Sage Binder image imports Python modules from its installed
+# site-packages directory instead of directly from the source checkout.
+# Link the two patched Python modules into the active installation so that
+# sage.all genuinely loads the PR implementation. There is no fallback API.
 RUN cd /home/sage/sage \
     && git apply --check ${HOME}/PR_dda09a7_spherical_bessel_sequences.patch \
     && git apply ${HOME}/PR_dda09a7_spherical_bessel_sequences.patch \
     && SAGE_PACKAGE_DIR=$(/usr/bin/sage -python -c "from pathlib import Path; import sage; print(Path(sage.__file__).resolve().parent)") \
-    && ln -sfn /home/sage/sage/src/sage/functions/all.py "${SAGE_PACKAGE_DIR}/functions/all.py" \
-    && ln -sfn /home/sage/sage/src/sage/functions/bessel.py "${SAGE_PACKAGE_DIR}/functions/bessel.py" \
-    && /usr/bin/sage -c "import inspect; from pathlib import Path; from sage.all import spherical_bessel_J_sequence, spherical_bessel_Y_sequence, spherical_hankel1_sequence; expected=Path('/home/sage/sage/src/sage/functions/bessel.py').resolve(); assert all(Path(inspect.getsourcefile(f)).resolve() == expected for f in (spherical_bessel_J_sequence, spherical_bessel_Y_sequence, spherical_hankel1_sequence)); print('PATCHED SAGE API CHECK: PASS')"
+    && ln -sfn /home/sage/sage/src/sage/functions/all.py \
+       "${SAGE_PACKAGE_DIR}/functions/all.py" \
+    && ln -sfn /home/sage/sage/src/sage/functions/bessel.py \
+       "${SAGE_PACKAGE_DIR}/functions/bessel.py" \
+    && /usr/bin/sage -c "import inspect; from pathlib import Path; from sage.all import spherical_bessel_J_sequence, spherical_bessel_Y_sequence, spherical_hankel1_sequence; expected = Path('/home/sage/sage/src/sage/functions/bessel.py').resolve(); functions = (spherical_bessel_J_sequence, spherical_bessel_Y_sequence, spherical_hankel1_sequence); assert all(Path(inspect.getsourcefile(function)).resolve() == expected for function in functions); print('PATCHED SAGE API CHECK: PASS')" \
+    && chown -R ${NB_USER}:${NB_USER} ${HOME}
 
 USER ${NB_USER}
 WORKDIR ${HOME}
 
-# Register SageMath and GoNB in the same JupyterLab instance.
+# Register the SageMath and GoNB kernels in the same JupyterLab environment.
 RUN mkdir -p $(/usr/bin/sage -sh -c 'jupyter --data-dir')/kernels \
-    && ln -sf $(/usr/bin/sage -sh -c 'echo $SAGE_VENV')/share/jupyter/kernels/sagemath \
+    && ln -sf \
+       $(/usr/bin/sage -sh -c 'echo $SAGE_VENV')/share/jupyter/kernels/sagemath \
        $(/usr/bin/sage -sh -c 'jupyter --data-dir')/kernels/sagemath \
     && go install github.com/janpfeifer/gonb@v0.9.6 \
     && go install golang.org/x/tools/cmd/goimports@v0.20.0 \
+    && go install golang.org/x/tools/gopls@v0.16.2 \
     && gonb --install \
     && go mod download
 
